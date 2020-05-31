@@ -4,7 +4,7 @@
 
 [mftail](https://github.com/deadc0de6/mftail) is multiple files follower (similar to `tail -f`) with color.
 
-# usage
+# Usage
 
 usage
 ```bash
@@ -16,7 +16,7 @@ Usage: mftail <path>...
     	Print version.
 ```
 
-# compile from source
+# Compile from source
 
 compile
 ```bash
