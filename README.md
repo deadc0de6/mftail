@@ -16,7 +16,15 @@ Usage: mftail <path>...
     	Print version.
 ```
 
-# Compile from source
+# Install
+
+Pick a release from [the release page](https://github.com/deadc0de6/mftail/releases) and
+install it in your `$PATH`:
+```
+sudo cp <downloaded-file> /usr/local/bin/
+```
+
+## Compile from source
 
 compile
 ```bash
