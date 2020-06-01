@@ -21,9 +21,15 @@ const (
 )
 
 var (
-	FileMatcher map[int]chan bool // wd -> channel
-	Colors                        = []int{31, 32, 33, 34, 35, 36, 37, 90, 91, 92, 93, 94, 95, 96}
-	EventCounts int               = 128
+	FileMatcher map[int]chan int // wd -> channel
+	Colors                       = []int{31, 32, 33, 34, 35, 36, 37, 90, 91, 92, 93, 94, 95, 96}
+	EventCounts int              = 128
+)
+
+const (
+	evModify = iota
+	evDelete
+	evAttrib
 )
 
 type fileEvent struct {
@@ -31,12 +37,12 @@ type fileEvent struct {
 	Wd    int // watch descriptor
 	Path  string
 	Color string
-	Chan  chan bool
+	Chan  chan int
 }
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
-	FileMatcher = make(map[int]chan bool)
+	FileMatcher = make(map[int]chan int)
 }
 
 // check file exists and is not dir
@@ -65,15 +71,14 @@ func rmWatch(fd int, wd int) {
 
 // follow file
 func follow(fe fileEvent) {
-	f, err := os.Open(fe.Path)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+	f := fileopen(nil, fe)
+	if f == nil {
 		return
 	}
 	bname := path.Base(fe.Path)
 
 	// go to end of file
-	f.Seek(0, os.SEEK_END)
+	prevSize, _ := f.Seek(0, os.SEEK_END)
 
 	r := bufio.NewReader(f)
 	for {
@@ -84,28 +89,77 @@ func follow(fe fileEvent) {
 			rmWatch(fe.Fd, fe.Wd)
 			return
 		}
-		if !b && !isFile(fe.Path) {
-			// file removed
-			rmWatch(fe.Fd, fe.Wd)
-			return
-		}
 
-		// read lines
-		for {
-			line, err := r.ReadBytes('\n')
-			if err != nil && err != io.EOF {
-				fmt.Fprintln(os.Stderr, err)
+		switch b {
+		case evModify:
+			fileInfo, _ := f.Stat()
+			curSize := fileInfo.Size()
+			if curSize < prevSize {
+				// truncated
+				fmt.Printf("mftail: %s: file truncated\n", fe.Path)
+				f = fileopen(f, fe)
+				if f == nil {
+					return
+				}
+				r = bufio.NewReader(f)
+			}
+			prevSize = curSize
+		//case evAttrib:
+		case evDelete:
+			f = fileopen(f, fe)
+			if f == nil {
 				return
 			}
-			// print the line
-			if len(line) > 0 {
-				fmt.Printf("%s:%s%s%s", bname, fe.Color, string(line), Reset)
-			}
-			if err == io.EOF {
-				break
-			}
+			r = bufio.NewReader(f)
+		}
+
+		// tail last lines
+		err := freadlines(r, bname, fe.Color)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
 		}
 	}
+}
+
+// open/re-open file
+func fileopen(cur *os.File, fe fileEvent) *os.File {
+	if !isFile(fe.Path) {
+		// file inexistant or removed
+		rmWatch(fe.Fd, fe.Wd)
+		return nil
+	}
+
+	// open/re-open
+	if cur != nil {
+		cur.Close()
+	}
+	f, err := os.Open(fe.Path)
+	if err != nil {
+		rmWatch(fe.Fd, fe.Wd)
+		fmt.Fprintln(os.Stderr, err)
+		return nil
+	}
+	return f
+}
+
+// read all lines from current pos and print to output
+func freadlines(r *bufio.Reader, header string, color string) error {
+	// read lines
+	for {
+		line, err := r.ReadBytes('\n')
+		if err != nil && err != io.EOF {
+			return err
+		}
+		// print the line
+		if len(line) > 0 {
+			fmt.Printf("%s:%s%s%s", header, color, string(line), Reset)
+		}
+		if err == io.EOF {
+			break
+		}
+	}
+	return nil
 }
 
 // read the events
@@ -116,16 +170,16 @@ func readEvents(buf []byte, bytesRead int) {
 		m := ev.Mask
 		ch := FileMatcher[int(ev.Wd)]
 		if m&unix.IN_ATTRIB == unix.IN_ATTRIB {
-			// unlink
-			ch <- false
+			// unlink (inode count changes)
+			ch <- evAttrib
 		}
 		if m&unix.IN_DELETE_SELF == unix.IN_DELETE_SELF {
 			// file removed
-			ch <- false
+			ch <- evDelete
 		}
 		if m&unix.IN_MODIFY == unix.IN_MODIFY {
 			// modified
-			ch <- true
+			ch <- evModify
 		}
 		offset += unix.SizeofInotifyEvent
 	}
@@ -206,7 +260,7 @@ func main() {
 		defer rmWatch(fd, wd)
 
 		// create a new channel for this file
-		ch := make(chan bool)
+		ch := make(chan int)
 		FileMatcher[wd] = ch
 
 		color := Colors[idx%len(Colors)]
