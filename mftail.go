@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	Version = "0.1"
+	Version = "0.2"
 	Reset   = "\033[0m"
 	Color   = "\033[%dm"
 )
