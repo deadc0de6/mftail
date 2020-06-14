@@ -1,3 +1,8 @@
+/*
+author: deadc0de6 (https://github.com/deadc0de6)
+Copyright (c) 2020, deadc0de6
+*/
+
 // a multiple file follower tool similar to `tail -f`
 package main
 
