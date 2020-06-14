@@ -2,7 +2,7 @@
 
 # mftail
 
-[mftail](https://github.com/deadc0de6/mftail) is multiple files follower (similar to `tail -f`) with color.
+[mftail](https://github.com/deadc0de6/mftail) is a multiple files follower (similar to `tail -f`) with color.
 
 # Usage
 
