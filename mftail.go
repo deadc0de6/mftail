@@ -20,15 +20,18 @@ import (
 )
 
 const (
-	Version = "0.2"
-	Reset   = "\033[0m"
-	Color   = "\033[%dm"
+	version = "0.2"
+	reset   = "\033[0m"
+	color   = "\033[%dm"
 )
 
 var (
+	// FileMatcher match fd to channel
 	FileMatcher map[int]chan int // wd -> channel
-	Colors                       = []int{31, 32, 33, 34, 35, 36, 37, 90, 91, 92, 93, 94, 95, 96}
-	EventCounts int              = 128
+	// Colors all colors
+	Colors = []int{31, 32, 33, 34, 35, 36, 37, 90, 91, 92, 93, 94, 95, 96}
+	// EventCounts total event to watch for
+	EventCounts int = 128
 )
 
 const (
@@ -158,7 +161,7 @@ func freadlines(r *bufio.Reader, header string, color string) error {
 		}
 		// print the line
 		if len(line) > 0 {
-			fmt.Printf("%s:%s%s%s", header, color, string(line), Reset)
+			fmt.Printf("%s:%s%s%s", header, color, string(line), reset)
 		}
 		if err == io.EOF {
 			break
@@ -208,14 +211,14 @@ func waitForNotif(fd int) error {
 }
 
 // print version
-func version() {
+func printVersion() {
 	name := path.Base(os.Args[0])
-	fmt.Fprintf(os.Stdout, "%s v%s\n", name, Version)
+	fmt.Fprintf(os.Stdout, "%s v%s\n", name, version)
 }
 
 // print usage and exit
 func usage() {
-	version()
+	printVersion()
 	name := path.Base(os.Args[0])
 	fmt.Fprintf(os.Stdout, "\nUsage: %s <path>...\n", name)
 	flag.PrintDefaults()
@@ -229,7 +232,7 @@ func main() {
 	flag.Parse()
 
 	if *vshortArg || *vlongArg {
-		version()
+		printVersion()
 		os.Exit(0)
 	}
 
@@ -268,12 +271,12 @@ func main() {
 		ch := make(chan int)
 		FileMatcher[wd] = ch
 
-		color := Colors[idx%len(Colors)]
+		col := Colors[idx%len(Colors)]
 		fevent := fileEvent{
 			Fd:    fd,
 			Wd:    wd,
 			Path:  path,
-			Color: fmt.Sprintf(Color, color),
+			Color: fmt.Sprintf(color, col),
 			Chan:  ch,
 		}
 
