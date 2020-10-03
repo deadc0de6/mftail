@@ -1,6 +1,6 @@
 #!/bin/bash
 
-name="uad"
+name="mftail"
 goos="linux"
 for goarch in arm arm64 386 amd64; do
   echo "building ${goos}-${goarch}"
