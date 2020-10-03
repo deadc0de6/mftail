@@ -8,17 +8,3 @@ go:
   - '1.15.x'
   - 'tip'
 os: linux
-jobs:
-  include:
-    - os: windows
-      script:
-      - go build
-      - bash ./test.sh
-    - os: osx
-      script:
-      - go build
-      - ./test.sh
-    - os: linux
-      script:
-      - go build
-      - ./test.sh
