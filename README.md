@@ -29,7 +29,7 @@ sudo cp <downloaded-file> /usr/local/bin/
 
 compile
 ```bash
-go build
+make
 mftail -help
 ```
 
