@@ -8,9 +8,9 @@ build:
 	go build -o $(BIN) $(SRC)
 
 build-all:
-	GOOS=$(OS) GOARCH=arm 	go build -v -o $(BIN)-$(OS)-arm $(SRC)
+	GOOS=$(OS) GOARCH=arm go build -v -o $(BIN)-$(OS)-arm $(SRC)
 	GOOS=$(OS) GOARCH=arm64 go build -v -o $(BIN)-$(OS)-arm64 $(SRC)
-	GOOS=$(OS) GOARCH=386 	go build -v -o $(BIN)-$(OS)-386 $(SRC)
+	GOOS=$(OS) GOARCH=386 go build -v -o $(BIN)-$(OS)-386 $(SRC)
 	GOOS=$(OS) GOARCH=amd64 go build -v -o $(BIN)-$(OS)-amd64 $(SRC)
 
 clean:
