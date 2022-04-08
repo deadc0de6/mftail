@@ -1,4 +1,4 @@
-module mftail
+module github.com/deadc0de6/mftail
 
 go 1.14
 
