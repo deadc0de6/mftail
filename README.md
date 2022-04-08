@@ -19,18 +19,21 @@ Usage: mftail <path>...
 
 # Install
 
-Pick a release from [the release page](https://github.com/deadc0de6/mftail/releases) and
-install it in your `$PATH`:
+Quick start:
+```bash
+## You need at least golang 1.14
+$ go install -v github.com/deadc0de6/mftail@latest
 ```
-sudo cp <downloaded-file> /usr/local/bin/
-```
+
+Pick a release from [the release page](https://github.com/deadc0de6/mftail/releases) and install it in your `$PATH`:
 
 ## Compile from source
 
 compile
 ```bash
-make
-mftail -help
+$ go mod tidy
+$ make
+$ mftail -help
 ```
 
 # Contribution
