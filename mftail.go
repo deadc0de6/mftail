@@ -263,7 +263,7 @@ func main() {
 		// add file to monitor
 		wd, err := addWatch(fd, path)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, fmt.Sprintf("\"%s\": %s", path, err.Error()))
+			fmt.Fprintf(os.Stderr, "\"%s\": %s", path, err.Error())
 			continue
 		}
 		defer rmWatch(fd, wd)
