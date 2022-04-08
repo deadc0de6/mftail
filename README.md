@@ -25,11 +25,9 @@ Quick start:
 $ go install -v github.com/deadc0de6/mftail@latest
 ```
 
-Pick a release from [the release page](https://github.com/deadc0de6/mftail/releases) and install it in your `$PATH`:
+Or pick a release from [the release page](https://github.com/deadc0de6/mftail/releases) and install it in your `$PATH`
 
-## Compile from source
-
-compile
+Or compile it from source
 ```bash
 $ go mod tidy
 $ make
