@@ -10,13 +10,14 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"golang.org/x/sys/unix"
 	"io"
 	"math/rand"
 	"os"
 	"path"
 	"time"
 	"unsafe"
+
+	unix "golang.org/x/sys/unix"
 )
 
 const (
