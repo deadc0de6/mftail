@@ -14,7 +14,6 @@ import (
 	"math/rand"
 	"os"
 	"path"
-	"time"
 	"unsafe"
 
 	unix "golang.org/x/sys/unix"
@@ -50,7 +49,6 @@ type fileEvent struct {
 }
 
 func init() {
-	rand.Seed(time.Now().UnixNano())
 	FileMatcher = make(map[int]chan int)
 }
 
@@ -87,7 +85,7 @@ func follow(fe fileEvent) {
 	bname := path.Base(fe.Path)
 
 	// go to end of file
-	prevSize, _ := f.Seek(0, os.SEEK_END)
+	prevSize, _ := f.Seek(0, io.SeekEnd)
 
 	r := bufio.NewReader(f)
 	for {
